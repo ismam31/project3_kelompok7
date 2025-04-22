@@ -1,9 +1,78 @@
 import 'package:flutter/material.dart';
-import 'package:kasir_kuliner/side_menu/pos_menu.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  bool isLoading = false;
+
+  Future<void> login() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    final url = Uri.parse(
+      'http://192.168.1.10:8000/api/login',
+    ); // Ganti sesuai IP Laravel-mu
+    final response = await http.post(
+      url,
+      body: {
+        'email': emailController.text,
+        'password': passwordController.text,
+      },
+    );
+
+    setState(() {
+      isLoading = false;
+    });
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['success'] == true) {
+        // Navigasi ke dashboard atau halaman home
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      } else {
+        showDialog(
+          context: context,
+          builder:
+              (_) => AlertDialog(
+                title: const Text("Gagal"),
+                content: Text(data['message']),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("OK"),
+                  ),
+                ],
+              ),
+        );
+      }
+    } else {
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+              title: const Text("Error"),
+              content: const Text("Terjadi kesalahan di server."),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,17 +82,13 @@ class LoginPage extends StatelessWidget {
         builder: (context, constraints) {
           return SingleChildScrollView(
             child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: constraints.maxHeight,
-              ),
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
               child: IntrinsicHeight(
                 child: Column(
                   children: [
-                    const SizedBox(height: 50),
-                    Image.asset(
-                      'assets/images/logo.png',
-                      height: 150,
-                    ),
+                    const SizedBox(height: 100),
+                    Image.asset('assets/images/logo.png', height: 100),
+                    const SizedBox(height: 16),
                     const Text(
                       'Masuk',
                       style: TextStyle(
@@ -40,7 +105,10 @@ class LoginPage extends StatelessWidget {
                     const SizedBox(height: 32),
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 32,
+                        ),
                         decoration: const BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.only(
@@ -51,26 +119,24 @@ class LoginPage extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            const SizedBox(height: 30),
-                            const TextField(
-                              decoration: InputDecoration(
+                            TextField(
+                              controller: emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: const InputDecoration(
                                 prefixIcon: Icon(Icons.person_outline),
-                                labelText: 'Nama Pengguna',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(100)),
-                                ),
+                                labelText: 'Email',
+                                border: OutlineInputBorder(),
                               ),
                             ),
-                            const SizedBox(height: 20),
-                            const TextField(
+                            const SizedBox(height: 16),
+                            TextField(
+                              controller: passwordController,
                               obscureText: true,
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 prefixIcon: Icon(Icons.lock_outline),
                                 suffixIcon: Icon(Icons.visibility_off),
                                 labelText: 'Kata Sandi',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(100)),
-                                ),
+                                border: OutlineInputBorder(),
                               ),
                             ),
                             Align(
@@ -81,22 +147,24 @@ class LoginPage extends StatelessWidget {
                               ),
                             ),
                             ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const PosMenu()),
-                                );
-                              },
+                              onPressed: isLoading ? null : login,
                               style: ElevatedButton.styleFrom(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(24),
                                 ),
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
                               ),
-                              child: const Text(
-                                'MASUK',
-                                style: TextStyle(fontSize: 16),
-                              ),
+                              child:
+                                  isLoading
+                                      ? const CircularProgressIndicator(
+                                        color: Colors.white,
+                                      )
+                                      : const Text(
+                                        'MASUK',
+                                        style: TextStyle(fontSize: 16),
+                                      ),
                             ),
                             const SizedBox(height: 16),
                             OutlinedButton.icon(
@@ -104,7 +172,9 @@ class LoginPage extends StatelessWidget {
                               icon: const Icon(Icons.g_mobiledata),
                               label: const Text('Sign in with Google'),
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30),
                                 ),
@@ -138,15 +208,24 @@ class LoginPage extends StatelessWidget {
                                   onTap: () {},
                                   child: const Text(
                                     'Ketentuan Layanan',
-                                    style: TextStyle(color: Colors.blue, fontSize: 12),
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ),
-                                const Text(' dan ', style: TextStyle(fontSize: 12)),
+                                const Text(
+                                  ' dan ',
+                                  style: TextStyle(fontSize: 12),
+                                ),
                                 GestureDetector(
                                   onTap: () {},
                                   child: const Text(
                                     'Kebijakan Privasi',
-                                    style: TextStyle(color: Colors.blue, fontSize: 12),
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ),
                               ],

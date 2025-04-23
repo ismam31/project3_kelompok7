@@ -126,6 +126,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.6"
+<<<<<<< HEAD
   flutter_secure_storage:
     dependency: "direct main"
     description:
@@ -174,6 +175,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+=======
+>>>>>>> b21ebdb7ca344adc4177fa5eb09e222480b03a2c
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -201,7 +204,11 @@ packages:
     source: hosted
     version: "0.15.5+1"
   http:
+<<<<<<< HEAD
     dependency: "direct main"
+=======
+    dependency: transitive
+>>>>>>> b21ebdb7ca344adc4177fa5eb09e222480b03a2c
     description:
       name: http
       sha256: fe7ab022b76f3034adc518fb6ea04a82387620e19977665ea18d30a1cf43442f
@@ -224,6 +231,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.5.4"
+<<<<<<< HEAD
   js:
     dependency: transitive
     description:
@@ -232,6 +240,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.7"
+=======
+>>>>>>> b21ebdb7ca344adc4177fa5eb09e222480b03a2c
   leak_tracker:
     dependency: transitive
     description:
@@ -469,6 +479,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+<<<<<<< HEAD
   win32:
     dependency: transitive
     description:
@@ -477,6 +488,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.12.0"
+=======
+>>>>>>> b21ebdb7ca344adc4177fa5eb09e222480b03a2c
   xdg_directories:
     dependency: transitive
     description:

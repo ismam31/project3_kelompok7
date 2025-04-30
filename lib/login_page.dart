@@ -21,16 +21,59 @@ class _LoginPageState extends State<LoginPage> {
       isLoading = true;
     });
 
-    await Future.delayed(const Duration(seconds: 1)); // simulasi delay loading
+    final url = Uri.parse(
+      'http://192.168.188.29:8000/api/login',
+    ); // Ganti sesuai IP Laravel-mu
+    final response = await http.post(
+      url,
+      body: {
+        'email': emailController.text,
+        'password': passwordController.text,
+      },
+    );
 
     setState(() {
       isLoading = false;
     });
 
-    // Langsung navigasi ke dashboard tanpa API
-    Navigator.pushReplacementNamed(context, '/dashboard');
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['success'] == true) {
+        // Navigasi ke dashboard atau halaman home
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      } else {
+        showDialog(
+          context: context,
+          builder:
+              (_) => AlertDialog(
+                title: const Text("Gagal"),
+                content: Text(data['message']),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("OK"),
+                  ),
+                ],
+              ),
+        );
+      }
+    } else {
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+              title: const Text("Error"),
+              content: const Text("Terjadi kesalahan di server."),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
+      );
+    }
   }
-
 
   @override
   Widget build(BuildContext context) {

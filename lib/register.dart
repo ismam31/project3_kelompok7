@@ -1,36 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'register.dart';
-import 'dart:convert';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
+  final TextEditingController namaController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
 
-  bool isLoading = false;
-
-  Future<void> login() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    await Future.delayed(const Duration(seconds: 1)); // simulasi delay loading
-
-    setState(() {
-      isLoading = false;
-    });
-
-    // Langsung navigasi ke dashboard tanpa API
-    Navigator.pushReplacementNamed(context, '/dashboard');
-  }
-
+  bool isChecked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
                     Image.asset('assets/images/logo.png', height: 100),
                     const SizedBox(height: 16),
                     const Text(
-                      'Masuk',
+                      'Pendaftaran',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -57,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      'Silakan login ke akun KasirKuliner',
+                      'Silahkan isi data dengan benar',
                       style: TextStyle(color: Colors.white70),
                     ),
                     const SizedBox(height: 32),
@@ -78,10 +61,19 @@ class _LoginPageState extends State<LoginPage> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             TextField(
+                              controller: namaController,
+                              decoration: const InputDecoration(
+                                prefixIcon: Icon(Icons.person_outline),
+                                labelText: 'Nama Pengguna',
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            TextField(
                               controller: emailController,
                               keyboardType: TextInputType.emailAddress,
                               decoration: const InputDecoration(
-                                prefixIcon: Icon(Icons.person_outline),
+                                prefixIcon: Icon(Icons.email_outlined),
                                 labelText: 'Email',
                                 border: OutlineInputBorder(),
                               ),
@@ -97,15 +89,40 @@ class _LoginPageState extends State<LoginPage> {
                                 border: OutlineInputBorder(),
                               ),
                             ),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: () {},
-                                child: const Text('Lupa kata sandi?'),
+                            const SizedBox(height: 16),
+                            TextField(
+                              controller: confirmPasswordController,
+                              obscureText: true,
+                              decoration: const InputDecoration(
+                                prefixIcon: Icon(Icons.lock_outline),
+                                suffixIcon: Icon(Icons.visibility_off),
+                                labelText: 'Konfirmasi Sandi',
+                                border: OutlineInputBorder(),
                               ),
                             ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: isChecked,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      isChecked = value!;
+                                    });
+                                  },
+                                ),
+                                const Expanded(
+                                  child: Text(
+                                    'Saya telah membaca dan menerima Ketentuan Layanan dan Kebijakan Privasi',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                ),
+                              ],
+                            ),
                             ElevatedButton(
-                              onPressed: isLoading ? null : login,
+                              onPressed: () {
+                                // aksi daftar di sini nanti
+                              },
                               style: ElevatedButton.styleFrom(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(24),
@@ -113,82 +130,25 @@ class _LoginPageState extends State<LoginPage> {
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 16,
                                 ),
+                                backgroundColor: const Color(0xFF0492C2),
                               ),
-                              child:
-                                  isLoading
-                                      ? const CircularProgressIndicator(
-                                        color: Colors.white,
-                                      )
-                                      : const Text(
-                                        'MASUK',
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                            ),
-                            const SizedBox(height: 16),
-                            OutlinedButton.icon(
-                              onPressed: () {},
-                              icon: const Icon(Icons.g_mobiledata),
-                              label: const Text('Sign in with Google'),
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
+                              child: const Text(
+                                'MENDAFTAR',
+                                style: TextStyle(fontSize: 16),
                               ),
                             ),
                             const SizedBox(height: 16),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Text('Belum punya akun? '),
+                                const Text('Sudah punya akun? '),
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => RegisterPage()),
-                                    );
+                                    Navigator.pop(context);
                                   },
                                   child: const Text(
-                                    'Mendaftar',
+                                    'Masuk',
                                     style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              'Dengan masuk aplikasi KasirKuliner berarti kamu telah membaca dan menerima',
-                              style: TextStyle(fontSize: 12),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {},
-                                  child: const Text(
-                                    'Ketentuan Layanan',
-                                    style: TextStyle(
-                                      color: Colors.blue,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                                const Text(
-                                  ' dan ',
-                                  style: TextStyle(fontSize: 12),
-                                ),
-                                GestureDetector(
-                                  onTap: () {},
-                                  child: const Text(
-                                    'Kebijakan Privasi',
-                                    style: TextStyle(
-                                      color: Colors.blue,
-                                      fontSize: 12,
-                                    ),
                                   ),
                                 ),
                               ],

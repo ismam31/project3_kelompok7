@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/dashboard_card.dart';
 import '../layouts/bottom_navigation.dart'; // Import BottomNavigation
+import 'pesan_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -87,7 +88,12 @@ class _DashboardPageState extends State<DashboardPage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.white,
         onPressed: () {
-          // Aksi untuk tombol Pesan
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const PesanPage(),
+            ),
+          );
         },
         shape: const CircleBorder(),
         child: const Icon(

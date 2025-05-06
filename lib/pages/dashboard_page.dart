@@ -1,31 +1,10 @@
 import 'package:flutter/material.dart';
 import '../widgets/dashboard_card.dart';
-import '../layouts/bottom_navigation.dart'; // Import BottomNavigation
-import 'pesan_page.dart';
+import '../layouts/bottom_navigation.dart';
+import '../widgets/custom_drawer.dart';
 
-class DashboardPage extends StatefulWidget {
+class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
-
-  @override
-  State<DashboardPage> createState() => _DashboardPageState();
-}
-
-class _DashboardPageState extends State<DashboardPage> {
-  int _selectedIndex = 0;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  final List<Widget> _pages = [
-    DashboardContent(), // dashboard content
-    Center(child: Text("Halaman Pesanan")),
-    Center(child: Text("Halaman Pesan")),
-    Center(child: Text("Halaman Menu")),
-    Center(child: Text("Halaman Laporan")),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -35,79 +14,25 @@ class _DashboardPageState extends State<DashboardPage> {
         title: const Text("Dashboard"),
         backgroundColor: const Color(0xFF0492C2),
         leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Color(0xFF0492C2),
+          builder:
+              (context) => IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () => Scaffold.of(context).openDrawer(),
               ),
-              child: Text(
-                'Kasir Kuliner',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('Profil Akun'),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Pengaturan'),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: const Icon(Icons.info),
-              title: const Text('Tentang Aplikasi'),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Logout'),
-              onTap: () {},
-            ),
-          ],
         ),
       ),
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigation(
-        selectedIndex: _selectedIndex,
-        onItemTapped: _onItemTapped,
+      drawer: const CustomDrawer(),
+      body: const DashboardContent(),
+      bottomNavigationBar: const BottomNavigation(
+        selectedIndex: 0,
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const PesanPage(),
-            ),
-          );
-        },
-        shape: const CircleBorder(),
-        child: const Icon(
-          Icons.restaurant_menu,
-          color: Color(0xFF0492C2),
-          size: 30,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
 
 class DashboardContent extends StatelessWidget {
+  const DashboardContent({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Padding(

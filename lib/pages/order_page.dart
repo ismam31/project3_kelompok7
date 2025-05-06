@@ -1,38 +1,84 @@
 import 'package:flutter/material.dart';
 import '../layouts/bottom_navigation.dart';
+import 'dashboard_page.dart';
+import '../widgets/custom_drawer.dart';
 
-class PesanPage extends StatefulWidget {
-  const PesanPage({super.key});
+class OrderPage extends StatefulWidget {
+  const OrderPage({super.key});
 
   @override
-  State<PesanPage> createState() => _PesanPageState();
+  State<OrderPage> createState() => _OrderPageState();
 }
 
-class _PesanPageState extends State<PesanPage> {
+class _OrderPageState extends State<OrderPage> {
   String selectedCategory = 'Makanan';
 
   final List<String> categories = ['Makanan', 'Minuman', 'Snack', 'Kopi'];
 
   final Map<String, List<Map<String, String>>> menuData = {
     'Makanan': [
-      {'name': 'Etong Bakar', 'price': '25000', 'image': 'assets/images/etong.jpg'},
-      {'name': 'Kakap Bakar', 'price': '30000', 'image': 'assets/images/etong.jpg'},
-      {'name': 'Bawal Bakar', 'price': '27000', 'image': 'assets/images/etong.jpg'},
+      {
+        'name': 'Etong Bakar',
+        'price': '25000',
+        'image': 'assets/images/etong.jpg',
+      },
+      {
+        'name': 'Kakap Bakar',
+        'price': '30000',
+        'image': 'assets/images/etong.jpg',
+      },
+      {
+        'name': 'Bawal Bakar',
+        'price': '27000',
+        'image': 'assets/images/etong.jpg',
+      },
     ],
     'Minuman': [
-      {'name': 'Es Teh Manis', 'price': '5000', 'image': 'assets/images/etong.jpg'},
+      {
+        'name': 'Es Teh Manis',
+        'price': '5000',
+        'image': 'assets/images/etong.jpg',
+      },
       {'name': 'Es Jeruk', 'price': '6000', 'image': 'assets/images/etong.jpg'},
-      {'name': 'Air Mineral', 'price': '4000', 'image': 'assets/images/etong.jpg'},
+      {
+        'name': 'Air Mineral',
+        'price': '4000',
+        'image': 'assets/images/etong.jpg',
+      },
     ],
     'Snack': [
-      {'name': 'Tahu Crispy', 'price': '10000', 'image': 'assets/images/etong.jpg'},
-      {'name': 'Tempe Mendoan', 'price': '9000', 'image': 'assets/images/etong.jpg'},
-      {'name': 'Udang Goreng', 'price': '15000', 'image': 'assets/images/etong.jpg'},
+      {
+        'name': 'Tahu Crispy',
+        'price': '10000',
+        'image': 'assets/images/etong.jpg',
+      },
+      {
+        'name': 'Tempe Mendoan',
+        'price': '9000',
+        'image': 'assets/images/etong.jpg',
+      },
+      {
+        'name': 'Udang Goreng',
+        'price': '15000',
+        'image': 'assets/images/etong.jpg',
+      },
     ],
     'Kopi': [
-      {'name': 'Kopi Hitam', 'price': '8000', 'image': 'assets/images/etong.jpg'},
-      {'name': 'Kopi Susu', 'price': '10000', 'image': 'assets/images/etong.jpg'},
-      {'name': 'Cappuccino', 'price': '12000', 'image': 'assets/images/etong.jpg'},
+      {
+        'name': 'Kopi Hitam',
+        'price': '8000',
+        'image': 'assets/images/etong.jpg',
+      },
+      {
+        'name': 'Kopi Susu',
+        'price': '10000',
+        'image': 'assets/images/etong.jpg',
+      },
+      {
+        'name': 'Cappuccino',
+        'price': '12000',
+        'image': 'assets/images/etong.jpg',
+      },
     ],
   };
 
@@ -46,11 +92,12 @@ class _PesanPageState extends State<PesanPage> {
       appBar: AppBar(
         title: const Text("Point Of Sale"),
         backgroundColor: const Color(0xFF0492C2),
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () {
-            // nanti bisa tambahin drawer atau dialog
-          },
+        leading: Builder(
+          builder:
+              (context) => IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+              ),
         ),
         actions: [
           IconButton(
@@ -79,25 +126,26 @@ class _PesanPageState extends State<PesanPage> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: categories.map((category) {
-                  bool isSelected = selectedCategory == category;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: ChoiceChip(
-                      label: Text(category),
-                      selected: isSelected,
-                      selectedColor: const Color(0xFF0492C2),
-                      onSelected: (_) {
-                        setState(() {
-                          selectedCategory = category;
-                        });
-                      },
-                      labelStyle: TextStyle(
-                        color: isSelected ? Colors.white : Colors.black,
-                      ),
-                    ),
-                  );
-                }).toList(),
+                children:
+                    categories.map((category) {
+                      bool isSelected = selectedCategory == category;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: ChoiceChip(
+                          label: Text(category),
+                          selected: isSelected,
+                          selectedColor: const Color(0xFF0492C2),
+                          onSelected: (_) {
+                            setState(() {
+                              selectedCategory = category;
+                            });
+                          },
+                          labelStyle: TextStyle(
+                            color: isSelected ? Colors.white : Colors.black,
+                          ),
+                        ),
+                      );
+                    }).toList(),
               ),
             ),
             const SizedBox(height: 10),
@@ -123,14 +171,8 @@ class _PesanPageState extends State<PesanPage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigation(
-        selectedIndex: 1,
-        onItemTapped: (index) {
-          // logic navigasi lo di sini
-          print("Tapped $index");
-        },
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      drawer: const CustomDrawer(),
+      bottomNavigationBar: BottomNavigation(selectedIndex: -1),
     );
   }
 }
@@ -150,20 +192,17 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 3,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
             child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-              child: Image.asset(
-                image,
-                fit: BoxFit.cover,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(12),
               ),
+              child: Image.asset(image, fit: BoxFit.cover),
             ),
           ),
           Padding(
@@ -183,10 +222,7 @@ class ProductCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   'Rp $price',
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 13,
-                  ),
+                  style: const TextStyle(color: Colors.grey, fontSize: 13),
                 ),
               ],
             ),

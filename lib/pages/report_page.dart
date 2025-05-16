@@ -10,7 +10,7 @@ class ReportPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Laporan Keuangan"),
-        backgroundColor: const Color(0xFF0492C2),
+        backgroundColor: Colors.blue,
         leading: Builder(
           builder:
               (context) => IconButton(

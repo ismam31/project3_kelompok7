@@ -9,27 +9,37 @@ class OrderPage extends StatefulWidget {
   State<OrderPage> createState() => _OrderPageState();
 }
 
-class _OrderPageState extends State<OrderPage> {
-  String selectedCategory = 'Makanan';
+class _OrderPageState extends State<OrderPage> with TickerProviderStateMixin {
+  String selectedCategory = 'Semua';
+  final List<String> categories = [
+    'Semua',
+    'Makanan',
+    'Minuman',
+    'Snack',
+    'Kopi',
+  ];
+  bool showCategoryFilter = false;
+  int totalItems = 0;
 
-  final List<String> categories = ['Makanan', 'Minuman', 'Snack', 'Kopi'];
-
-  final Map<String, List<Map<String, String>>> menuData = {
+  final Map<String, List<Map<String, dynamic>>> menuData = {
     'Makanan': [
       {
         'name': 'Etong Bakar',
         'price': '25000',
         'image': 'assets/images/etong.jpg',
+        'quantity': 0,
       },
       {
         'name': 'Kakap Bakar',
         'price': '30000',
         'image': 'assets/images/etong.jpg',
+        'quantity': 0,
       },
       {
         'name': 'Bawal Bakar',
         'price': '27000',
         'image': 'assets/images/etong.jpg',
+        'quantity': 0,
       },
     ],
     'Minuman': [
@@ -37,12 +47,19 @@ class _OrderPageState extends State<OrderPage> {
         'name': 'Es Teh Manis',
         'price': '5000',
         'image': 'assets/images/etong.jpg',
+        'quantity': 0,
       },
-      {'name': 'Es Jeruk', 'price': '6000', 'image': 'assets/images/etong.jpg'},
+      {
+        'name': 'Es Jeruk',
+        'price': '6000',
+        'image': 'assets/images/etong.jpg',
+        'quantity': 0,
+      },
       {
         'name': 'Air Mineral',
         'price': '4000',
         'image': 'assets/images/etong.jpg',
+        'quantity': 0,
       },
     ],
     'Snack': [
@@ -50,16 +67,19 @@ class _OrderPageState extends State<OrderPage> {
         'name': 'Tahu Crispy',
         'price': '10000',
         'image': 'assets/images/etong.jpg',
+        'quantity': 0,
       },
       {
         'name': 'Tempe Mendoan',
         'price': '9000',
         'image': 'assets/images/etong.jpg',
+        'quantity': 0,
       },
       {
         'name': 'Udang Goreng',
         'price': '15000',
         'image': 'assets/images/etong.jpg',
+        'quantity': 0,
       },
     ],
     'Kopi': [
@@ -67,30 +87,89 @@ class _OrderPageState extends State<OrderPage> {
         'name': 'Kopi Hitam',
         'price': '8000',
         'image': 'assets/images/etong.jpg',
+        'quantity': 0,
       },
       {
         'name': 'Kopi Susu',
         'price': '10000',
         'image': 'assets/images/etong.jpg',
+        'quantity': 0,
       },
       {
         'name': 'Cappuccino',
         'price': '12000',
         'image': 'assets/images/etong.jpg',
+        'quantity': 0,
       },
     ],
   };
+
+  void _addToCart(String category, int index) {
+    setState(() {
+      menuData[category]![index]['quantity']++;
+      totalItems++;
+      _showAddToCartAnimation(context, index);
+    });
+  }
+
+  void _showAddToCartAnimation(BuildContext context, int index) {
+    final overlay = Overlay.of(context);
+    final renderBox = context.findRenderObject() as RenderBox;
+    final position = renderBox.localToGlobal(Offset.zero);
+
+    // Create animation controller with proper vsync
+    final controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this, // Add 'with TickerProviderStateMixin' to your class
+    )..forward();
+
+    final animation = CurvedAnimation(
+      parent: controller,
+      curve: Curves.elasticOut,
+    );
+
+    overlay.insert(
+      OverlayEntry(
+        builder:
+            (context) => Positioned(
+              left: position.dx + renderBox.size.width / 2,
+              top: position.dy,
+              child: Material(
+                color: Colors.transparent,
+                child: ScaleTransition(
+                  scale: animation,
+                  child: const Icon(Icons.shopping_cart, color: Colors.green),
+                ),
+              ),
+            ),
+      ),
+    );
+
+    // Clean up controller after animation completes
+    controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        controller.dispose();
+      }
+    });
+  }
+
+  List<Map<String, dynamic>> get filteredItems {
+    if (selectedCategory == 'Semua') {
+      return menuData.values.expand((list) => list).toList();
+    }
+    return menuData[selectedCategory]!;
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final crossAxisCount = screenWidth > 600 ? 3 : 2;
-    final List<Map<String, String>> items = menuData[selectedCategory]!;
+    final items = filteredItems;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Point Of Sale"),
-        backgroundColor: const Color(0xFF0492C2),
+        backgroundColor: Colors.blue,
         leading: Builder(
           builder:
               (context) => IconButton(
@@ -98,55 +177,100 @@ class _OrderPageState extends State<OrderPage> {
                 onPressed: () => Scaffold.of(context).openDrawer(),
               ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () {
-              // aksi keranjang
-            },
-          ),
-        ],
       ),
+      drawer: const CustomDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Cari menu...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Cari menu...',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                      ),
+                    ),
+                  ),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-              ),
-            ),
-            const SizedBox(height: 10),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children:
-                    categories.map((category) {
-                      bool isSelected = selectedCategory == category;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: ChoiceChip(
-                          label: Text(category),
-                          selected: isSelected,
-                          selectedColor: const Color(0xFF0492C2),
-                          onSelected: (_) {
-                            setState(() {
-                              selectedCategory = category;
-                            });
-                          },
-                          labelStyle: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black,
+                IconButton(
+                  icon: const Icon(Icons.filter_alt),
+                  onPressed: () {
+                    setState(() {
+                      showCategoryFilter = !showCategoryFilter;
+                    });
+                  },
+                ),
+                Stack(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.shopping_cart),
+                      onPressed: () {
+                        // Navigate to cart page
+                      },
+                    ),
+                    if (totalItems > 0)
+                      Positioned(
+                        right: 8,
+                        top: 8,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 16,
+                            minHeight: 16,
+                          ),
+                          child: Text(
+                            '$totalItems',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
-                      );
-                    }).toList(),
-              ),
+                      ),
+                  ],
+                ),
+              ],
             ),
+            if (showCategoryFilter) ...[
+              const SizedBox(height: 10),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children:
+                      categories.map((category) {
+                        bool isSelected = selectedCategory == category;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: ChoiceChip(
+                            label: Text(category),
+                            selected: isSelected,
+                            selectedColor: const Color(0xFF0492C2),
+                            onSelected: (_) {
+                              setState(() {
+                                selectedCategory = category;
+                              });
+                            },
+                            labelStyle: TextStyle(
+                              color: isSelected ? Colors.white : Colors.black,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                ),
+              ),
+            ],
             const SizedBox(height: 10),
             Expanded(
               child: GridView.builder(
@@ -159,10 +283,19 @@ class _OrderPageState extends State<OrderPage> {
                 ),
                 itemBuilder: (context, index) {
                   final item = items[index];
-                  return ProductCard(
-                    name: item['name']!,
-                    price: item['price']!,
-                    image: item['image']!,
+                  return GestureDetector(
+                    onTap:
+                        () => _addToCart(
+                          item.containsKey('category')
+                              ? item['category']
+                              : selectedCategory,
+                          index,
+                        ),
+                    child: ProductCard(
+                      name: item['name'],
+                      price: item['price'],
+                      image: item['image'],
+                    ),
                   );
                 },
               ),
@@ -170,8 +303,7 @@ class _OrderPageState extends State<OrderPage> {
           ],
         ),
       ),
-      drawer: const CustomDrawer(),
-      bottomNavigationBar: BottomNavigation(selectedIndex: -1),
+      bottomNavigationBar: const BottomNavigation(selectedIndex: -1),
     );
   }
 }
@@ -222,6 +354,15 @@ class ProductCard extends StatelessWidget {
                 Text(
                   'Rp $price',
                   style: const TextStyle(color: Colors.grey, fontSize: 13),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 36),
+                    padding: EdgeInsets.zero,
+                  ),
+                  child: const Text('Tambah Keranjang'),
                 ),
               ],
             ),

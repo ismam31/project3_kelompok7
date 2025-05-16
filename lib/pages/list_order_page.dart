@@ -10,7 +10,7 @@ class ListOrderPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Pesanan"),
-        backgroundColor: const Color(0xFF0492C2),
+        backgroundColor: Colors.blue,
         leading: Builder(
           builder:
               (context) => IconButton(

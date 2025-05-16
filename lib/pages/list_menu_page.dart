@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../layouts/bottom_navigation.dart';
+import '../widgets/custom_drawer.dart';
 
 class ListMenuPage extends StatefulWidget {
   const ListMenuPage({super.key});
@@ -241,6 +243,8 @@ class _ListMenuPageState extends State<ListMenuPage> {
         title: const Text("Daftar Menu + Kategori"),
         backgroundColor: Colors.blue,
       ),
+      drawer: const CustomDrawer(),
+      bottomNavigationBar: const BottomNavigation(selectedIndex: 2),
       body: Column(
         children: [
           // Search Bar

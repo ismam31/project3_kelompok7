@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'cart/cart_item_model.dart';
+import 'cart/cart_screen.dart';
 import '../layouts/bottom_navigation.dart';
 import '../widgets/custom_drawer.dart';
 
@@ -9,7 +11,7 @@ class OrderPage extends StatefulWidget {
   State<OrderPage> createState() => _OrderPageState();
 }
 
-class _OrderPageState extends State<OrderPage> with TickerProviderStateMixin {
+class _OrderPageState extends State<OrderPage> {
   String selectedCategory = 'Semua';
   final List<String> categories = [
     'Semua',
@@ -19,137 +21,118 @@ class _OrderPageState extends State<OrderPage> with TickerProviderStateMixin {
     'Kopi',
   ];
   bool showCategoryFilter = false;
-  int totalItems = 0;
+  List<CartItemModel> cartItems = [];
 
   final Map<String, List<Map<String, dynamic>>> menuData = {
     'Makanan': [
       {
         'name': 'Etong Bakar',
-        'price': '25000',
+        'price': 25000,
         'image': 'assets/images/etong.jpg',
-        'quantity': 0,
       },
       {
         'name': 'Kakap Bakar',
-        'price': '30000',
+        'price': 30000,
         'image': 'assets/images/etong.jpg',
-        'quantity': 0,
       },
       {
         'name': 'Bawal Bakar',
-        'price': '27000',
+        'price': 27000,
         'image': 'assets/images/etong.jpg',
-        'quantity': 0,
       },
     ],
     'Minuman': [
       {
         'name': 'Es Teh Manis',
-        'price': '5000',
+        'price': 5000,
         'image': 'assets/images/etong.jpg',
-        'quantity': 0,
       },
-      {
-        'name': 'Es Jeruk',
-        'price': '6000',
-        'image': 'assets/images/etong.jpg',
-        'quantity': 0,
-      },
+      {'name': 'Es Jeruk', 'price': 6000, 'image': 'assets/images/etong.jpg'},
       {
         'name': 'Air Mineral',
-        'price': '4000',
+        'price': 4000,
         'image': 'assets/images/etong.jpg',
-        'quantity': 0,
       },
     ],
     'Snack': [
       {
         'name': 'Tahu Crispy',
-        'price': '10000',
+        'price': 10000,
         'image': 'assets/images/etong.jpg',
-        'quantity': 0,
       },
       {
         'name': 'Tempe Mendoan',
-        'price': '9000',
+        'price': 9000,
         'image': 'assets/images/etong.jpg',
-        'quantity': 0,
       },
       {
         'name': 'Udang Goreng',
-        'price': '15000',
+        'price': 15000,
         'image': 'assets/images/etong.jpg',
-        'quantity': 0,
       },
     ],
     'Kopi': [
-      {
-        'name': 'Kopi Hitam',
-        'price': '8000',
-        'image': 'assets/images/etong.jpg',
-        'quantity': 0,
-      },
-      {
-        'name': 'Kopi Susu',
-        'price': '10000',
-        'image': 'assets/images/etong.jpg',
-        'quantity': 0,
-      },
+      {'name': 'Kopi Hitam', 'price': 8000, 'image': 'assets/images/etong.jpg'},
+      {'name': 'Kopi Susu', 'price': 10000, 'image': 'assets/images/etong.jpg'},
       {
         'name': 'Cappuccino',
-        'price': '12000',
+        'price': 12000,
         'image': 'assets/images/etong.jpg',
-        'quantity': 0,
       },
     ],
   };
 
   void _addToCart(String category, int index) {
+    final item = menuData[category]![index];
+    final existingItemIndex = cartItems.indexWhere(
+      (cartItem) => cartItem.id == '${category}_$index',
+    );
+
     setState(() {
-      menuData[category]![index]['quantity']++;
-      totalItems++;
-      _showAddToCartAnimation(context, index);
+      if (existingItemIndex >= 0) {
+        cartItems[existingItemIndex].incrementQuantity();
+      } else {
+        cartItems.add(
+          CartItemModel(
+            id: '${category}_$index',
+            name: item['name'],
+            price: item['price'],
+            image: item['image'],
+          ),
+        );
+      }
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${item['name']} ditambahkan ke keranjang')),
+    );
+  }
+
+  void _increaseItem(CartItemModel item) {
+    setState(() {
+      item.incrementQuantity();
     });
   }
 
-  void _showAddToCartAnimation(BuildContext context, int index) {
-    final overlay = Overlay.of(context);
-    final renderBox = context.findRenderObject() as RenderBox;
-    final position = renderBox.localToGlobal(Offset.zero);
-
-    // Create animation controller with proper vsync
-    final controller = AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this, // Add 'with TickerProviderStateMixin' to your class
-    )..forward();
-
-    final animation = CurvedAnimation(
-      parent: controller,
-      curve: Curves.elasticOut,
-    );
-
-    overlay.insert(
-      OverlayEntry(
-        builder:
-            (context) => Positioned(
-              left: position.dx + renderBox.size.width / 2,
-              top: position.dy,
-              child: Material(
-                color: Colors.transparent,
-                child: ScaleTransition(
-                  scale: animation,
-                  child: const Icon(Icons.shopping_cart, color: Colors.green),
-                ),
-              ),
-            ),
-      ),
-    );
-
-    // Clean up controller after animation completes
-    controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        controller.dispose();
+  void _decreaseItem(CartItemModel item) {
+    setState(() {
+      if (item.quantity > 1) {
+        item.decrementQuantity();
+      } else {
+        cartItems.remove(item);
       }
+    });
+  }
+
+  void _removeItem(CartItemModel item) {
+    setState(() {
+      cartItems.remove(item);
+    });
+  }
+
+  void _clearCart() {
+    setState(() {
+      cartItems.clear();
     });
   }
 
@@ -199,23 +182,28 @@ class _OrderPageState extends State<OrderPage> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.filter_alt),
-                  onPressed: () {
-                    setState(() {
-                      showCategoryFilter = !showCategoryFilter;
-                    });
-                  },
-                ),
+                const SizedBox(width: 10),
                 Stack(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.shopping_cart),
+                      icon: const Icon(Icons.shopping_cart, size: 30),
                       onPressed: () {
-                        // Navigate to cart page
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => CartScreen(
+                                  cartItems: cartItems,
+                                  onIncrease: _increaseItem,
+                                  onDecrease: _decreaseItem,
+                                  onRemove: _removeItem,
+                                  onClear: _clearCart,
+                                ),
+                          ),
+                        );
                       },
                     ),
-                    if (totalItems > 0)
+                    if (cartItems.isNotEmpty)
                       Positioned(
                         right: 8,
                         top: 8,
@@ -230,7 +218,7 @@ class _OrderPageState extends State<OrderPage> with TickerProviderStateMixin {
                             minHeight: 16,
                           ),
                           child: Text(
-                            '$totalItems',
+                            '${cartItems.fold(0, (sum, item) => sum + item.quantity)}',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 10,
@@ -243,34 +231,32 @@ class _OrderPageState extends State<OrderPage> with TickerProviderStateMixin {
                 ),
               ],
             ),
-            if (showCategoryFilter) ...[
-              const SizedBox(height: 10),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children:
-                      categories.map((category) {
-                        bool isSelected = selectedCategory == category;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: ChoiceChip(
-                            label: Text(category),
-                            selected: isSelected,
-                            selectedColor: const Color(0xFF0492C2),
-                            onSelected: (_) {
-                              setState(() {
-                                selectedCategory = category;
-                              });
-                            },
-                            labelStyle: TextStyle(
-                              color: isSelected ? Colors.white : Colors.black,
-                            ),
+            const SizedBox(height: 10),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children:
+                    categories.map((category) {
+                      bool isSelected = selectedCategory == category;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: ChoiceChip(
+                          label: Text(category),
+                          selected: isSelected,
+                          selectedColor: const Color(0xFF0492C2),
+                          onSelected: (_) {
+                            setState(() {
+                              selectedCategory = category;
+                            });
+                          },
+                          labelStyle: TextStyle(
+                            color: isSelected ? Colors.white : Colors.black,
                           ),
-                        );
-                      }).toList(),
-                ),
+                        ),
+                      );
+                    }).toList(),
               ),
-            ],
+            ),
             const SizedBox(height: 10),
             Expanded(
               child: GridView.builder(
@@ -283,19 +269,17 @@ class _OrderPageState extends State<OrderPage> with TickerProviderStateMixin {
                 ),
                 itemBuilder: (context, index) {
                   final item = items[index];
-                  return GestureDetector(
-                    onTap:
+                  return ProductCard(
+                    name: item['name'],
+                    price: item['price'].toString(),
+                    image: item['image'],
+                    onAddToCart:
                         () => _addToCart(
-                          item.containsKey('category')
-                              ? item['category']
+                          selectedCategory == 'Semua'
+                              ? _findCategory(item['name'])
                               : selectedCategory,
                           index,
                         ),
-                    child: ProductCard(
-                      name: item['name'],
-                      price: item['price'],
-                      image: item['image'],
-                    ),
                   );
                 },
               ),
@@ -306,18 +290,29 @@ class _OrderPageState extends State<OrderPage> with TickerProviderStateMixin {
       bottomNavigationBar: const BottomNavigation(selectedIndex: -1),
     );
   }
+
+  String _findCategory(String itemName) {
+    for (var category in menuData.keys) {
+      if (menuData[category]!.any((item) => item['name'] == itemName)) {
+        return category;
+      }
+    }
+    return 'Makanan';
+  }
 }
 
 class ProductCard extends StatelessWidget {
   final String name;
   final String price;
   final String image;
+  final VoidCallback onAddToCart;
 
   const ProductCard({
     super.key,
     required this.name,
     required this.price,
     required this.image,
+    required this.onAddToCart,
   });
 
   @override
@@ -357,12 +352,8 @@ class ProductCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 36),
-                    padding: EdgeInsets.zero,
-                  ),
-                  child: const Text('Tambah Keranjang'),
+                  onPressed: onAddToCart,
+                  child: const Text('Tambah ke Keranjang'),
                 ),
               ],
             ),

@@ -1,41 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:kasir_kuliner/receipt_pdf.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'package:provider/provider.dart';
+import '../providers/orders_provider.dart';
 import '../layouts/bottom_navigation.dart';
 import '../widgets/custom_drawer.dart';
 
-class ListOrderPage extends StatelessWidget {
+class ListOrderPage extends StatefulWidget {
   const ListOrderPage({super.key});
+  @override
+  State<ListOrderPage> createState() => _ListOrderPageState();
+}
 
+class _ListOrderPageState extends State<ListOrderPage> {
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> orders = [
-      {
-        'customerName': 'John Doe',
-        'guestCount': '4',
-        'orderType': 'Dine In',
-        'tableNumber': '5',
-        'date': DateTime.now().subtract(const Duration(hours: 2)),
-        'isPaid': false,
-        'finalTotal': 125000,
-      },
-      {
-        'customerName': 'Jane Smith',
-        'guestCount': '2',
-        'orderType': 'Take Away',
-        'tableNumber': '',
-        'date': DateTime.now().subtract(const Duration(days: 1)),
-        'isPaid': true,
-        'finalTotal': 75000,
-      },
-      {
-        'customerName': 'Bob Johnson',
-        'guestCount': '6',
-        'orderType': 'Delivery',
-        'tableNumber': '',
-        'date': DateTime.now().subtract(const Duration(days: 2)),
-        'isPaid': true,
-        'finalTotal': 185000,
-      },
-    ];
+    final orders = context.watch<OrdersProvider>().orders;
 
     return Scaffold(
       appBar: AppBar(
@@ -90,23 +73,23 @@ class ListOrderPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
-                        _getOrderTypeIcon(order['orderType']),
+                        _getOrderTypeIcon(order.orderType),
                         color: Colors.blue,
                       ),
                     ),
                     title: Text(
-                      order['customerName'],
+                      order.customerName,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 4),
-                        Text('Tipe: ${order['orderType']}'),
-                        if (order['orderType'] == 'Dine In')
-                          Text('Meja: ${order['tableNumber']}'),
-                        Text('Tamu: ${order['guestCount']}'),
-                        Text('Tanggal: ${_formatDate(order['date'])}'),
+                        Text('Tipe: ${order.orderType}'),
+                        if (order.orderType == 'Dine In')
+                          Text('Meja: ${order.tableNumber}'),
+                        Text('Tamu: ${order.guestCount}'),
+                        Text('Tanggal: ${_formatDate(order.date)}'),
                         const SizedBox(height: 4),
                         Row(
                           children: [
@@ -117,16 +100,16 @@ class ListOrderPage extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 color:
-                                    order['isPaid']
+                                    order.isPaid
                                         ? Colors.green.withOpacity(0.2)
                                         : Colors.orange.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
-                                order['isPaid'] ? 'LUNAS' : 'BELUM BAYAR',
+                                order.isPaid ? 'LUNAS' : 'BELUM BAYAR',
                                 style: TextStyle(
                                   color:
-                                      order['isPaid']
+                                      order.isPaid
                                           ? Colors.green
                                           : Colors.orange,
                                   fontSize: 12,
@@ -136,7 +119,7 @@ class ListOrderPage extends StatelessWidget {
                             ),
                             const Spacer(),
                             Text(
-                              'Rp ${order['finalTotal']}',
+                              'Rp ${order.finalTotal}',
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -148,7 +131,7 @@ class ListOrderPage extends StatelessWidget {
                     trailing: IconButton(
                       icon: const Icon(Icons.more_vert),
                       onPressed: () {
-                        _showOrderActions(context, orders, index);
+                        _showOrderActions(context, order.id, order.isPaid);
                       },
                     ),
                   ),
@@ -180,11 +163,8 @@ class ListOrderPage extends StatelessWidget {
         '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 
-  void _showOrderActions(
-    BuildContext context,
-    List<Map<String, dynamic>> orders,
-    int index,
-  ) {
+  void _showOrderActions(BuildContext context, String orderId, bool isPaid) {
+    final ordersProvider = Provider.of<OrdersProvider>(context, listen: false);
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -201,12 +181,10 @@ class ListOrderPage extends StatelessWidget {
             ),
             ListTile(
               leading: Icon(
-                orders[index]['isPaid'] ? Icons.payment : Icons.paid,
-                color: orders[index]['isPaid'] ? Colors.green : Colors.blue,
+                isPaid ? Icons.payment : Icons.paid,
+                color: isPaid ? Colors.green : Colors.blue,
               ),
-              title: Text(
-                orders[index]['isPaid'] ? 'Sudah Dibayar' : 'Tandai Lunas',
-              ),
+              title: Text(isPaid ? 'Sudah Dibayar' : 'Tandai Lunas'),
               onTap: () {
                 Navigator.pop(context);
                 // Toggle payment status
@@ -215,9 +193,14 @@ class ListOrderPage extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.print),
               title: const Text('Cetak Struk'),
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(context);
-                // Print receipt
+                final order = ordersProvider.orders.firstWhere((order) => order.id == orderId);
+                final pdf = await generateReceipt(order);
+
+                await Printing.layoutPdf(
+                  onLayout: (PdfPageFormat format) async => pdf.save(),
+                );
               },
             ),
             ListTile(

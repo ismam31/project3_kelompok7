@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'providers/orders_provider.dart';
 import 'pages/dashboard_page.dart';
 import 'pages/list_order_page.dart';
 import 'pages/list_menu_page.dart';
@@ -7,7 +9,15 @@ import 'pages/order_page.dart';
 import 'login.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => OrdersProvider()),
+        // Tambahkan provider lainnya jika ada
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 # project3_kelompok7
-=======
-=======
->>>>>>> b21ebdb7ca344adc4177fa5eb09e222480b03a2c
 # kasir_kuliner
 
 A new Flutter project.
@@ -20,7 +15,3 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
-<<<<<<< HEAD
->>>>>>> b21ebdb (First commit)
-=======
->>>>>>> b21ebdb7ca344adc4177fa5eb09e222480b03a2c

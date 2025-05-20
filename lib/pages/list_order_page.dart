@@ -1,9 +1,5 @@
+import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:kasir_kuliner/receipt_pdf.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 import '../providers/orders_provider.dart';
 import '../layouts/bottom_navigation.dart';
@@ -16,10 +12,131 @@ class ListOrderPage extends StatefulWidget {
 }
 
 class _ListOrderPageState extends State<ListOrderPage> {
+  List<BluetoothDevice> device = [];
+  BluetoothDevice? selectedDevice;
+  BlueThermalPrinter printer = BlueThermalPrinter.instance;
+
+  void _showPrintDialog(BuildContext context, String orderId) {
+    final ordersProvider = Provider.of<OrdersProvider>(context, listen: false);
+    final order = ordersProvider.orders.firstWhere(
+      (order) => order.id == orderId,
+    );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Pilih Printer'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButton<BluetoothDevice>(
+                value: selectedDevice,
+                hint: const Text('Pilih printer'),
+                onChanged: (device) => setState(() => selectedDevice = device),
+                items:
+                    device
+                        .map(
+                          (device) => DropdownMenuItem(
+                            value: device,
+                            child: Text(device.name ?? 'Unknown Device'),
+                          ),
+                        )
+                        .toList(),
+              ),
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (!(await printer.isConnected)!) {
+                        printer.connect(selectedDevice!);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Printer terhubung')),
+                        );
+                      }
+                    },
+                    child: const Text('Connect'),
+                  ),
+                ],
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  printer.disconnect();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Printer terputus')),
+                  );
+                },
+                child: const Text('Disconnect'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  // Cetak struk
+                  printer.printNewLine();
+                  printer.printCustom("RUMAH MAKAN SEAFOOD", 3, 1);
+                  printer.printCustom(
+                    "Patimban, Kec Pusakanagara, Kabupaten Subang",
+                    2,
+                    1,
+                  );
+                  printer.printCustom("--------------------------------", 1, 0);
+                  printer.printNewLine();
+                  printer.printLeftRight("Nama", order.customerName, 1);
+                  printer.printLeftRight("Tipe", order.orderType, 1);
+                  if (order.orderType == "Dine In") {
+                    printer.printLeftRight(
+                      "Meja",
+                      order.tableNumber.toString(),
+                      1,
+                    );
+                  }
+                  printer.printLeftRight(
+                    "Tamu",
+                    order.guestCount.toString(),
+                    1,
+                  );
+                  printer.printCustom("--------------------------------", 1, 0);
+                  printer.printLeftRight("Total", "Rp ${order.finalTotal}", 1);
+                  printer.printLeftRight(
+                    "Status",
+                    order.isPaid ? "LUNAS" : "BELUM BAYAR",
+                    1,
+                  );
+                  printer.printNewLine();
+                  printer.printCustom("Terima Kasih!", 2, 1);
+                  printer.printNewLine();
+                  printer.printNewLine();
+                },
+                child: const Text('Print'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Batal'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getDevice();
+  }
+
+  void getDevice() async {
+    device = await printer.getBondedDevices();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final orders = context.watch<OrdersProvider>().orders;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Daftar Pesanan"),
@@ -193,14 +310,9 @@ class _ListOrderPageState extends State<ListOrderPage> {
             ListTile(
               leading: const Icon(Icons.print),
               title: const Text('Cetak Struk'),
-              onTap: () async {
+              onTap: () {
                 Navigator.pop(context);
-                final order = ordersProvider.orders.firstWhere((order) => order.id == orderId);
-                final pdf = await generateReceipt(order);
-
-                await Printing.layoutPdf(
-                  onLayout: (PdfPageFormat format) async => pdf.save(),
-                );
+                _showPrintDialog(context, orderId);
               },
             ),
             ListTile(
@@ -219,4 +331,8 @@ class _ListOrderPageState extends State<ListOrderPage> {
       },
     );
   }
+}
+
+extension on BlueThermalPrinter {
+  printTicket(String orderId) {}
 }

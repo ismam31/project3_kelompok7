@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../pages/cart/order_model.dart';
 import '../pages/cart/cart_item_model.dart';
 
+
 class OrdersProvider with ChangeNotifier {
   List<OrderModel> _orders = [];
 
@@ -53,4 +54,6 @@ class OrdersProvider with ChangeNotifier {
       debugPrint('Error toggling payment status: $e');
     }
   }
+
+  void printTicket(String orderId) {}
 }

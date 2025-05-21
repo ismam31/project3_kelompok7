@@ -6,7 +6,9 @@ import 'pages/list_order_page.dart';
 import 'pages/list_menu_page.dart';
 import 'pages/report_page.dart';
 import 'pages/order_page.dart';
-import 'pages/pengaturan_page.dart'; // <-- Tambahan
+import 'pages/pengaturan_page.dart'; 
+import 'pages/about_application_page.dart'; 
+import 'pages/profile_account_page.dart'; 
 import 'login.dart';
 
 void main() {
@@ -36,7 +38,9 @@ class MyApp extends StatelessWidget {
         '/list-menu': (context) => const ListMenuPage(),
         '/report': (context) => const ReportPage(),
         '/order': (context) => const OrderPage(),
-        '/pengaturan': (context) => const PengaturanPage(), // <-- Tambahan
+        '/pengaturan': (context) => const PengaturanPage(),
+        '/tentang-aplikasi': (context) => const AboutApplicationPage(), 
+        '/profil-akun': (context) => const ProfileAccountPage(), 
       },
       debugShowCheckedModeBanner: false,
     );

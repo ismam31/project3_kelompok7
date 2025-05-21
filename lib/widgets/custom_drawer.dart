@@ -40,7 +40,7 @@ class CustomDrawer extends StatelessWidget {
             title: const Text('Profil Akun'),
             tileColor: Colors.grey[200],
             onTap: () {
-              Navigator.pop(context);
+              Navigator.pushNamed(context, '/profil-akun');
             },
           ),
           const Divider(height: 1),
@@ -56,7 +56,7 @@ class CustomDrawer extends StatelessWidget {
             leading: const Icon(Icons.info, color: Colors.green),
             title: const Text('Tentang Aplikasi'),
             onTap: () {
-              Navigator.pop(context);
+                 Navigator.pushNamed(context, '/tentang-aplikasi');
             },
           ),
           const Divider(height: 1),

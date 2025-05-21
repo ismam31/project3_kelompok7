@@ -48,7 +48,7 @@ class CustomDrawer extends StatelessWidget {
             leading: const Icon(Icons.settings, color: Colors.orange),
             title: const Text('Pengaturan'),
             onTap: () {
-              Navigator.pushNamed(context, '/setting');
+              Navigator.pushNamed(context, '/pengaturan');
             },
           ),
           const Divider(height: 1),

@@ -6,6 +6,7 @@ import 'pages/list_order_page.dart';
 import 'pages/list_menu_page.dart';
 import 'pages/report_page.dart';
 import 'pages/order_page.dart';
+import 'pages/pengaturan_page.dart'; // <-- Tambahan
 import 'login.dart';
 
 void main() {
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
         '/list-menu': (context) => const ListMenuPage(),
         '/report': (context) => const ReportPage(),
         '/order': (context) => const OrderPage(),
+        '/pengaturan': (context) => const PengaturanPage(), // <-- Tambahan
       },
       debugShowCheckedModeBanner: false,
     );

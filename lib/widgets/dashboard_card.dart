@@ -51,7 +51,7 @@ class DashboardCard extends StatelessWidget {
   }
 }
 
-// Widget Grafik Mini (Contoh untuk "Trend Penjualan")
+// Widget Grafik Mini
 class MiniLineChart extends StatelessWidget {
   final List<double> data;
   

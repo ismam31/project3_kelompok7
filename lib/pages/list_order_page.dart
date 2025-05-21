@@ -1,7 +1,9 @@
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:typed_data';
 import '../providers/orders_provider.dart';
+import 'order_detail_page.dart';
 import '../layouts/bottom_navigation.dart';
 import '../widgets/custom_drawer.dart';
 
@@ -44,6 +46,7 @@ class _ListOrderPageState extends State<ListOrderPage> {
                         .toList(),
               ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   ElevatedButton(
                     onPressed: () async {
@@ -74,11 +77,11 @@ class _ListOrderPageState extends State<ListOrderPage> {
                   printer.printCustom("RUMAH MAKAN SEAFOOD", 3, 1);
                   printer.printCustom(
                     "Patimban, Kec Pusakanagara, Kabupaten Subang",
-                    2,
+                    1,
                     1,
                   );
-                  printer.printCustom("--------------------------------", 1, 0);
-                  printer.printNewLine();
+                  printer.writeBytes(Uint8List.fromList([27, 64]));
+                  printer.printCustom("--------------------------------", 1, 1);
                   printer.printLeftRight("Nama", order.customerName, 1);
                   printer.printLeftRight("Tipe", order.orderType, 1);
                   if (order.orderType == "Dine In") {
@@ -93,7 +96,25 @@ class _ListOrderPageState extends State<ListOrderPage> {
                     order.guestCount.toString(),
                     1,
                   );
-                  printer.printCustom("--------------------------------", 1, 0);
+                  printer.printCustom("--------------------------------", 1, 1);
+                  for (var item in order.items) {
+                    printer.printCustom(item.name, 1, 0);
+                    String qtyPrice = "x${item.quantity} Rp${item.price}";
+                    printer.printLeftRight(
+                      qtyPrice,
+                      "Rp${item.price * item.quantity}",
+                      1,
+                    );
+                  }
+                  printer.printCustom("--------------------------------", 1, 1);
+                  printer.printLeftRight(
+                    "Subtotal",
+                    "Rp ${order.finalTotal + order.discount}",
+                    1,
+                  );
+                  if (order.discount > 0) {
+                    printer.printLeftRight("Diskon", "Rp ${order.discount}", 1);
+                  }
                   printer.printLeftRight("Total", "Rp ${order.finalTotal}", 1);
                   printer.printLeftRight(
                     "Status",
@@ -292,8 +313,16 @@ class _ListOrderPageState extends State<ListOrderPage> {
               leading: const Icon(Icons.receipt),
               title: const Text('Detail Pesanan'),
               onTap: () {
+                final order = ordersProvider.orders.firstWhere(
+                  (order) => order.id == orderId,
+                );
                 Navigator.pop(context);
-                // Navigate to order detail
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OrderDetailPage(order: order),
+                  ),
+                );
               },
             ),
             ListTile(
@@ -331,8 +360,4 @@ class _ListOrderPageState extends State<ListOrderPage> {
       },
     );
   }
-}
-
-extension on BlueThermalPrinter {
-  printTicket(String orderId) {}
 }

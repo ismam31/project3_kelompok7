@@ -104,7 +104,10 @@ class _OrderPageState extends State<OrderPage> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${item['name']} ditambahkan ke keranjang')),
+      SnackBar(
+        content: Text('${item['name']} ditambahkan ke keranjang'),
+        duration: const Duration(milliseconds: 500),
+      ),
     );
   }
 

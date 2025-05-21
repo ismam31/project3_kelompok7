@@ -49,7 +49,6 @@ class _CartScreenState extends State<CartScreen> {
       return;
     }
 
-    // Here you would typically save to database or state management
     final ordersProvider = Provider.of<OrdersProvider>(context, listen: false);
     ordersProvider.addOrder(
       customerName: _customerNameController.text,
@@ -106,10 +105,18 @@ class _CartScreenState extends State<CartScreen> {
                           ),
                           TextButton(
                             onPressed: () {
-                              widget.onClear();
                               Navigator.pop(ctx);
+                              setState(() {
+                                widget.cartItems.clear();
+                              });
                             },
-                            child: const Text('Hapus'),
+                            child: const Text(
+                              'Hapus',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -353,7 +360,7 @@ class _CartScreenState extends State<CartScreen> {
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
-                                  onPressed: _saveOrder,
+                                  onPressed: () => _saveOrder(),
                                   child: const Text(
                                     'SIMPAN',
                                     style: TextStyle(
@@ -375,16 +382,30 @@ class _CartScreenState extends State<CartScreen> {
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
-                                  onPressed: () {
+                                  onPressed: () async {
+                                    if (_customerNameController.text.isEmpty) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Nama customer harus diisi',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    _saveOrder();
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text(
                                           'Pesanan berhasil dibuat!',
                                         ),
-                                        duration: Duration(seconds: 2),
+                                        duration: Duration(seconds: 1),
                                       ),
                                     );
                                     widget.onClear();
+                                    Navigator.pop(context);
                                   },
                                   child: const Text(
                                     'CHECKOUT',

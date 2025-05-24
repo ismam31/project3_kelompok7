@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:intl/intl.dart';
-import 'cart/cart_item_model.dart';
-import 'cart/order_model.dart';
+import 'package:kasir_kuliner/pages/cart/cart_item_model.dart';
+import 'package:kasir_kuliner/pages/cart/order_model.dart';
+import 'package:kasir_kuliner/pages/order_page.dart';
+import 'package:kasir_kuliner/pages/checkout_screen.dart';
 
 class OrderDetailPage extends StatefulWidget {
   final OrderModel order;
-  const OrderDetailPage({super.key, required this.order});
+  const OrderDetailPage({
+    super.key,
+    required this.order,
+    required this.existingOrder,
+  });
+  final OrderModel existingOrder;
 
   @override
   State<OrderDetailPage> createState() => _OrderDetailPageState();
@@ -92,17 +99,38 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     }
 
     printer.printNewLine();
-    printer.printCustom("== STRUK PEMBELIAN ==", 3, 1);
-    printer.printNewLine();
-    printer.printCustom("Pembeli: ${widget.order.customerName}", 1, 0);
-    printer.printCustom("Meja: ${widget.order.tableNumber}", 1, 0);
-    printer.printCustom("Tamu: ${widget.order.guestCount}", 1, 0);
+    printer.printCustom("WARUNG TIKUNGAN", 3, 1);
+    printer.printCustom("Patimban, Kec Pusakanagara, Kabupaten Subang", 1, 1);
+    printer.printCustom("--------------------------------", 1, 1);
+    printer.printLeftRight("Nama", widget.order.customerName, 1);
+    printer.printLeftRight("Tipe", widget.order.orderType, 1);
+    if (widget.order.orderType == "Dine In") {
+      printer.printLeftRight("Meja", widget.order.tableNumber.toString(), 1);
+    }
+    printer.printLeftRight("Tamu", widget.order.guestCount.toString(), 1);
     printer.printCustom("--------------------------------", 1, 1);
     for (var item in widget.order.items) {
-      printer.printCustom("x${item.quantity} ${item.name}", 1, 0);
+      printer.printCustom(item.name, 1, 0);
+      String qtyPrice = "x${item.quantity} Rp${item.price}";
+      printer.printLeftRight(qtyPrice, "Rp${item.price * item.quantity}", 1);
     }
     printer.printCustom("--------------------------------", 1, 1);
-    printer.printCustom("Terima kasih!", 1, 1);
+    printer.printLeftRight(
+      "Subtotal",
+      "Rp ${widget.order.finalTotal + widget.order.discount}",
+      1,
+    );
+    if (widget.order.discount > 0) {
+      printer.printLeftRight("Diskon", "Rp ${widget.order.discount}", 1);
+    }
+    printer.printLeftRight("Total", "Rp ${widget.order.finalTotal}", 1);
+    printer.printLeftRight(
+      "Status",
+      widget.order.isPaid ? "LUNAS" : "BELUM BAYAR",
+      1,
+    );
+    printer.printNewLine();
+    printer.printCustom("Terima Kasih!", 2, 1);
     printer.printNewLine();
     printer.printNewLine();
   }
@@ -153,15 +181,20 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 ),
               ],
             ),
-            if (widget.order.orderType == 'Dine In') ...[
-              const SizedBox(height: 10),
-              _buildInfoCard(
-                context,
-                icon: Icons.table_restaurant,
-                title: 'Meja',
-                value: widget.order.tableNumber,
-              ),
-            ],
+            Row(
+              children: [
+                if (widget.order.orderType == 'Dine In') ...[
+                  const SizedBox(height: 10),
+                  _buildInfoCard(
+                    context,
+                    icon: Icons.table_restaurant,
+                    title: 'Meja',
+                    value: widget.order.tableNumber,
+                  ),
+                ],
+                _buildStatusChip(widget.order.isPaid),
+              ],
+            ),
             const SizedBox(height: 20),
             const Text(
               'Items Pesanan',
@@ -197,17 +230,61 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               isTotal: true,
             ),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatusChip(widget.order.isPaid),
-                ElevatedButton(
-                  onPressed: () {
-                    _printReceipt();
-                  },
-                  child: const Text('Cetak Struk'),
-                ),
-              ],
+            Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(8.0),
+              child: Wrap(
+                spacing: 8.0,
+                runSpacing: 8.0,
+                alignment: WrapAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      _printReceipt();
+                    },
+                    child: const Text('Cetak Struk'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      // ke halaman checkout
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => CheckoutScreen(
+                                cartItems: widget.order.items,
+                                customerName: widget.order.customerName,
+                                guestCount: widget.order.guestCount,
+                                tableNumber: widget.order.tableNumber,
+                                orderType: widget.order.orderType,
+                                discount: widget.order.discount,
+                                isPaid: widget.order.isPaid,
+                                onClear: () {
+                                  setState(() {});
+                                },
+                              ),
+                        ),
+                      );
+                    },
+                    child: const Text('Checkout'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      // navigasi ke halaman OrderPage buat nambah pesanan
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => OrderPage(
+                                existingOrder: widget.existingOrder,
+                              ),
+                        ),
+                      );
+                    },
+                    child: const Text('Tambah Pesanan'),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

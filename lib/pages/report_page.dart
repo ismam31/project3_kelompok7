@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../layouts/bottom_navigation.dart';
-import '../widgets/custom_drawer.dart';
+import 'package:kasir_kuliner/layouts/bottom_navigation.dart';
+import 'package:kasir_kuliner/widgets/custom_drawer.dart';
 
 class ReportPage extends StatefulWidget {
   const ReportPage({super.key});

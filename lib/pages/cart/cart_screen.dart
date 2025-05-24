@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/orders_provider.dart';
-import 'cart_item_model.dart';
+import 'package:kasir_kuliner/pages/checkout_screen.dart';
+import 'package:kasir_kuliner/pages../../providers/orders_provider.dart';
+import 'package:kasir_kuliner/pages/cart/cart_item_model.dart';
 
 class CartScreen extends StatefulWidget {
   final List<CartItemModel> cartItems;
@@ -284,11 +285,17 @@ class _CartScreenState extends State<CartScreen> {
                                   Text('Rp ${item.totalPrice}'),
                                   IconButton(
                                     icon: const Icon(Icons.remove),
-                                    onPressed: () => widget.onDecrease(item),
+                                    onPressed: () {
+                                      widget.onDecrease(item);
+                                      setState(() {});
+                                    },
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.add),
-                                    onPressed: () => widget.onIncrease(item),
+                                    onPressed: () {
+                                      widget.onIncrease(item);
+                                      setState(() {});
+                                    },
                                   ),
                                 ],
                               ),
@@ -382,7 +389,7 @@ class _CartScreenState extends State<CartScreen> {
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
-                                  onPressed: () async {
+                                  onPressed: () {
                                     if (_customerNameController.text.isEmpty) {
                                       ScaffoldMessenger.of(
                                         context,
@@ -395,18 +402,33 @@ class _CartScreenState extends State<CartScreen> {
                                       );
                                       return;
                                     }
-                                    _saveOrder();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Pesanan berhasil dibuat!',
-                                        ),
-                                        duration: Duration(seconds: 1),
+
+                                    // Arahkan ke halaman Checkout
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) => CheckoutScreen(
+                                              cartItems: widget.cartItems,
+                                              customerName:
+                                                  _customerNameController.text,
+                                              guestCount:
+                                                  _guestCountController.text,
+                                              tableNumber:
+                                                  _tableNumberController.text,
+                                              orderType: _orderType,
+                                              discount:
+                                                  int.tryParse(
+                                                    _discountController.text,
+                                                  ) ??
+                                                  0,
+                                              isPaid: _isPaid,
+                                              onClear: widget.onClear,
+                                            ),
                                       ),
                                     );
-                                    widget.onClear();
-                                    Navigator.pop(context);
                                   },
+
                                   child: const Text(
                                     'CHECKOUT',
                                     style: TextStyle(

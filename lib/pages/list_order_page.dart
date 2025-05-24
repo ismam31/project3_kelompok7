@@ -1,11 +1,10 @@
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:typed_data';
-import '../providers/orders_provider.dart';
-import 'order_detail_page.dart';
-import '../layouts/bottom_navigation.dart';
-import '../widgets/custom_drawer.dart';
+import 'package:kasir_kuliner/providers/orders_provider.dart';
+import 'package:kasir_kuliner/pages/order_detail_page.dart';
+import 'package:kasir_kuliner/layouts/bottom_navigation.dart';
+import 'package:kasir_kuliner/widgets/custom_drawer.dart';
 
 class ListOrderPage extends StatefulWidget {
   const ListOrderPage({super.key});
@@ -74,55 +73,17 @@ class _ListOrderPageState extends State<ListOrderPage> {
                 onPressed: () {
                   // Cetak struk
                   printer.printNewLine();
-                  printer.printCustom("RUMAH MAKAN SEAFOOD", 3, 1);
-                  printer.printCustom(
-                    "Patimban, Kec Pusakanagara, Kabupaten Subang",
-                    1,
-                    1,
-                  );
-                  printer.writeBytes(Uint8List.fromList([27, 64]));
-                  printer.printCustom("--------------------------------", 1, 1);
-                  printer.printLeftRight("Nama", order.customerName, 1);
-                  printer.printLeftRight("Tipe", order.orderType, 1);
-                  if (order.orderType == "Dine In") {
-                    printer.printLeftRight(
-                      "Meja",
-                      order.tableNumber.toString(),
-                      1,
-                    );
-                  }
-                  printer.printLeftRight(
-                    "Tamu",
-                    order.guestCount.toString(),
-                    1,
-                  );
+                  printer.printCustom("== STRUK PEMBELIAN ==", 3, 1);
+                  printer.printNewLine();
+                  printer.printCustom("Pembeli: ${order.customerName}", 1, 0);
+                  printer.printCustom("Meja: ${order.tableNumber}", 1, 0);
+                  printer.printCustom("Tamu: ${order.guestCount}", 1, 0);
                   printer.printCustom("--------------------------------", 1, 1);
                   for (var item in order.items) {
-                    printer.printCustom(item.name, 1, 0);
-                    String qtyPrice = "x${item.quantity} Rp${item.price}";
-                    printer.printLeftRight(
-                      qtyPrice,
-                      "Rp${item.price * item.quantity}",
-                      1,
-                    );
+                    printer.printCustom("x${item.quantity} ${item.name}", 1, 0);
                   }
                   printer.printCustom("--------------------------------", 1, 1);
-                  printer.printLeftRight(
-                    "Subtotal",
-                    "Rp ${order.finalTotal + order.discount}",
-                    1,
-                  );
-                  if (order.discount > 0) {
-                    printer.printLeftRight("Diskon", "Rp ${order.discount}", 1);
-                  }
-                  printer.printLeftRight("Total", "Rp ${order.finalTotal}", 1);
-                  printer.printLeftRight(
-                    "Status",
-                    order.isPaid ? "LUNAS" : "BELUM BAYAR",
-                    1,
-                  );
-                  printer.printNewLine();
-                  printer.printCustom("Terima Kasih!", 2, 1);
+                  printer.printCustom("Terima kasih!", 1, 1);
                   printer.printNewLine();
                   printer.printNewLine();
                 },
@@ -320,7 +281,9 @@ class _ListOrderPageState extends State<ListOrderPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => OrderDetailPage(order: order),
+                    builder:
+                        (context) =>
+                            OrderDetailPage(order: order, existingOrder: order),
                   ),
                 );
               },

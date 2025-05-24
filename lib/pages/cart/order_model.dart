@@ -26,6 +26,21 @@ class OrderModel {
     required this.items,
   });
 
+  factory OrderModel.empty() {
+    return OrderModel(
+      id: '',
+      customerName: '',
+      guestCount: '',
+      orderType: '',
+      tableNumber: '',
+      date: DateTime.now(),
+      isPaid: false,
+      finalTotal: 0,
+      discount: 0,
+      items: [],
+    );
+  }
+
   OrderModel copyWith({bool? isPaid}) {
     return OrderModel(
       id: id,

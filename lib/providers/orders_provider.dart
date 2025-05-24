@@ -1,7 +1,7 @@
 // providers/orders_provider.dart
 import 'package:flutter/material.dart';
-import '../pages/cart/order_model.dart';
-import '../pages/cart/cart_item_model.dart';
+import 'package:kasir_kuliner/pages/cart/order_model.dart';
+import 'package:kasir_kuliner/pages/cart/cart_item_model.dart';
 
 
 class OrdersProvider with ChangeNotifier {

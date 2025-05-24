@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../widgets/dashboard_card.dart';
-import '../layouts/bottom_navigation.dart';
-import '../widgets/custom_drawer.dart';
+import 'package:kasir_kuliner/widgets/dashboard_card.dart';
+import 'package:kasir_kuliner/layouts/bottom_navigation.dart';
+import 'package:kasir_kuliner/widgets/custom_drawer.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});

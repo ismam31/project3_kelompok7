@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'cart/cart_item_model.dart';
-import 'cart/cart_screen.dart';
-import '../layouts/bottom_navigation.dart';
-import '../widgets/custom_drawer.dart';
+import 'package:kasir_kuliner/pages/cart/cart_item_model.dart';
+import 'package:kasir_kuliner/pages/cart/cart_screen.dart';
+import 'package:kasir_kuliner/layouts/bottom_navigation.dart';
+import 'package:kasir_kuliner/widgets/custom_drawer.dart';
+import 'package:kasir_kuliner/pages/cart/order_model.dart';
 
 class OrderPage extends StatefulWidget {
-  const OrderPage({super.key});
+  final OrderModel existingOrder;
+  const OrderPage({super.key, required this.existingOrder});
 
   @override
   State<OrderPage> createState() => _OrderPageState();

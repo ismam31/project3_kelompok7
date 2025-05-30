@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kasir_kuliner/register.dart';
+import 'package:kasir_kuliner/services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,6 +13,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
 
   bool isLoading = false;
 
@@ -28,7 +31,6 @@ class _LoginPageState extends State<LoginPage> {
     // Langsung navigasi ke dashboard tanpa API
     Navigator.pushReplacementNamed(context, '/dashboard');
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +126,19 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             const SizedBox(height: 16),
                             OutlinedButton.icon(
-                              onPressed: () {},
+                              onPressed: () async {
+                                final UserCredential =
+                                    await _authService.signInWithGoogle();
+                                if (UserCredential != null) {
+                                  print("login sukses");
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    '/dashboard',
+                                  );
+                                } else {
+                                  print("login gagal");
+                                }
+                              },
                               icon: const Icon(Icons.g_mobiledata),
                               label: const Text('Sign in with Google'),
                               style: OutlinedButton.styleFrom(
@@ -145,12 +159,17 @@ class _LoginPageState extends State<LoginPage> {
                                   onTap: () {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => RegisterPage()),
+                                      MaterialPageRoute(
+                                        builder: (context) => RegisterPage(),
+                                      ),
                                     );
                                   },
                                   child: const Text(
                                     'Mendaftar',
-                                    style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                               ],

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:kasir_kuliner/pages/cart/order_model.dart';
 import 'package:provider/provider.dart';
 import 'package:kasir_kuliner/providers/orders_provider.dart';
@@ -12,7 +14,11 @@ import 'package:kasir_kuliner/pages/about_application_page.dart';
 import 'package:kasir_kuliner/pages/profile_account_page.dart';
 import 'package:kasir_kuliner/login.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(
     MultiProvider(
       providers: [

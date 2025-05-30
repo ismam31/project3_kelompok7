@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "1010882334142",
+    "project_id": "kasir-kuliner",
+    "storage_bucket": "kasir-kuliner.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1010882334142:android:30af7ccff582f485427def",
+        "android_client_info": {
+          "package_name": "com.example.kasir_kuliner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1010882334142-tecakimk1tgoarlfv95t9paq9lm07kfv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.kasir_kuliner",
+            "certificate_hash": "b5b64e76dc02a35b1e6200a416a53f7b804648f9"
+          }
+        },
+        {
+          "client_id": "1010882334142-rbk1bh5sgjdu7httjjd6dfrr4si0ftq3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnU-QtEmkOFLC1dyfY_fOGtwDkxe74T8M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1010882334142-rbk1bh5sgjdu7httjjd6dfrr4si0ftq3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1010882334142-h9kr4tucnfvf2p00da9a0n9dbsdsluul.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.kasirKuliner"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

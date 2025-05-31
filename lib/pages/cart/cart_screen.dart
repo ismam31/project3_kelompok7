@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:kasir_kuliner/pages/checkout_screen.dart';
-import 'package:kasir_kuliner/pages../../providers/orders_provider.dart';
+import 'package:kasir_kuliner/providers/orders_provider.dart';
 import 'package:kasir_kuliner/pages/cart/cart_item_model.dart';
 
 class CartScreen extends StatefulWidget {
@@ -145,119 +145,126 @@ class _CartScreenState extends State<CartScreen> {
                   ],
                 ),
               )
-              : Column(
-                children: [
-                  // Customer Input Section
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        TextField(
-                          controller: _customerNameController,
-                          decoration: InputDecoration(
-                            labelText: 'Nama Customer',
-                            prefixIcon: const Icon(Icons.person),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: _guestCountController,
-                                decoration: InputDecoration(
-                                  labelText: 'Jumlah Tamu',
-                                  prefixIcon: const Icon(Icons.people),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                keyboardType: TextInputType.number,
+              : SingleChildScrollView(
+                // <-- Tambahin ini biar nggak overflow
+                child: Column(
+                  children: [
+                    // Customer Input Section
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: _customerNameController,
+                            decoration: InputDecoration(
+                              labelText: 'Nama Customer',
+                              prefixIcon: const Icon(Icons.person),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
                               ),
                             ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: TextField(
-                                controller: _tableNumberController,
-                                decoration: InputDecoration(
-                                  labelText: 'Nomor Meja',
-                                  prefixIcon: const Icon(
-                                    Icons.table_restaurant,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                keyboardType: TextInputType.number,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        DropdownButtonFormField<String>(
-                          value: _orderType,
-                          decoration: InputDecoration(
-                            labelText: 'Jenis Pesanan',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
                           ),
-                          items:
-                              _orderTypes
-                                  .map(
-                                    (type) => DropdownMenuItem(
-                                      value: type,
-                                      child: Text(type),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: _guestCountController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Jumlah Tamu',
+                                    prefixIcon: const Icon(Icons.people),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
-                                  )
-                                  .toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              _orderType = value!;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                        TextField(
-                          controller: _discountController,
-                          decoration: InputDecoration(
-                            labelText: 'Diskon (Rp)',
-                            prefixIcon: const Icon(Icons.discount),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: TextField(
+                                  controller: _tableNumberController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Nomor Meja',
+                                    prefixIcon: const Icon(
+                                      Icons.table_restaurant,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                ),
+                              ),
+                            ],
                           ),
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) {
-                            setState(() {});
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            const Text('Status Pembayaran:'),
-                            const SizedBox(width: 10),
-                            Switch(
-                              value: _isPaid,
-                              onChanged: (value) {
-                                setState(() {
-                                  _isPaid = value;
-                                });
-                              },
-                              activeColor: Colors.green,
+                          const SizedBox(height: 10),
+                          DropdownButtonFormField<String>(
+                            value: _orderType,
+                            decoration: InputDecoration(
+                              labelText: 'Jenis Pesanan',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                            Text(_isPaid ? 'Sudah Bayar' : 'Belum Bayar'),
-                          ],
-                        ),
-                      ],
+                            items:
+                                _orderTypes
+                                    .map(
+                                      (type) => DropdownMenuItem(
+                                        value: type,
+                                        child: Text(type),
+                                      ),
+                                    )
+                                    .toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _orderType = value!;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          TextField(
+                            controller: _discountController,
+                            decoration: InputDecoration(
+                              labelText: 'Diskon (Rp)',
+                              prefixIcon: const Icon(Icons.discount),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) {
+                              setState(() {});
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              const Text('Status Pembayaran:'),
+                              const SizedBox(width: 10),
+                              Switch(
+                                value: _isPaid,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isPaid = value;
+                                  });
+                                },
+                                activeColor: Colors.green,
+                              ),
+                              Text(_isPaid ? 'Sudah Bayar' : 'Belum Bayar'),
+                            ],
+                          ),
+                          // ...
+                        ],
+                      ),
                     ),
-                  ),
-                  // Cart Items List
-                  Expanded(
-                    child: ListView.builder(
+
+                    // Cart Items List
+                    ListView.builder(
+                      shrinkWrap:
+                          true, // <-- ini penting biar ListView di dalam ScrollView bisa
+                      physics:
+                          const NeverScrollableScrollPhysics(), // disable scroll nested-nya
                       itemCount: widget.cartItems.length,
                       itemBuilder: (ctx, index) {
                         final item = widget.cartItems[index];
@@ -304,147 +311,151 @@ class _CartScreenState extends State<CartScreen> {
                         );
                       },
                     ),
-                  ),
-                  // Total and Buttons Section
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceVariant,
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(12),
+
+                    // Total and Buttons Section
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surfaceVariant,
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(12),
+                        ),
                       ),
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('Total Harga:'),
-                            Text('Rp $totalAmount'),
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('Diskon:'),
-                            Text(
-                              'Rp ${_discountController.text.isEmpty ? 0 : int.parse(_discountController.text)}',
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Total Akhir:',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text('Total Harga:'),
+                              Text('Rp $totalAmount'),
+                            ],
+                          ),
+                          const SizedBox(height: 5),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text('Diskon:'),
+                              Text(
+                                'Rp ${_discountController.text.isEmpty ? 0 : int.parse(_discountController.text)}',
                               ),
-                            ),
-                            Text(
-                              'Rp $discountedTotal',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blue,
+                            ],
+                          ),
+                          const SizedBox(height: 5),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Total Akhir:',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: SizedBox(
-                                height: 50,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
+                              Text(
+                                'Rp $discountedTotal',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: SizedBox(
+                                  height: 50,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                     ),
-                                  ),
-                                  onPressed: () => _saveOrder(),
-                                  child: const Text(
-                                    'SIMPAN',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white,
+                                    onPressed: () => _saveOrder(),
+                                    child: const Text(
+                                      'SIMPAN',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: SizedBox(
-                                height: 50,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: SizedBox(
+                                  height: 50,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                     ),
-                                  ),
-                                  onPressed: () {
-                                    if (_customerNameController.text.isEmpty) {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            'Nama customer harus diisi',
+                                    onPressed: () {
+                                      if (_customerNameController
+                                          .text
+                                          .isEmpty) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Nama customer harus diisi',
+                                            ),
                                           ),
+                                        );
+                                        return;
+                                      }
+
+                                      // Arahkan ke halaman Checkout
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => CheckoutScreen(
+                                                cartItems: widget.cartItems,
+                                                customerName:
+                                                    _customerNameController
+                                                        .text,
+                                                guestCount:
+                                                    _guestCountController.text,
+                                                tableNumber:
+                                                    _tableNumberController.text,
+                                                orderType: _orderType,
+                                                discount:
+                                                    int.tryParse(
+                                                      _discountController.text,
+                                                    ) ??
+                                                    0,
+                                                isPaid: _isPaid,
+                                                onClear: widget.onClear,
+                                              ),
                                         ),
                                       );
-                                      return;
-                                    }
+                                    },
 
-                                    // Arahkan ke halaman Checkout
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) => CheckoutScreen(
-                                              cartItems: widget.cartItems,
-                                              customerName:
-                                                  _customerNameController.text,
-                                              guestCount:
-                                                  _guestCountController.text,
-                                              tableNumber:
-                                                  _tableNumberController.text,
-                                              orderType: _orderType,
-                                              discount:
-                                                  int.tryParse(
-                                                    _discountController.text,
-                                                  ) ??
-                                                  0,
-                                              isPaid: _isPaid,
-                                              onClear: widget.onClear,
-                                            ),
+                                    child: const Text(
+                                      'CHECKOUT',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.white,
                                       ),
-                                    );
-                                  },
-
-                                  child: const Text(
-                                    'CHECKOUT',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white,
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
     );
   }

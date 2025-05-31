@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:kasir_kuliner/services/auth_service.dart';
 
-class CustomDrawer extends StatelessWidget {
+class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
+
+  @override
+  State<CustomDrawer> createState() => _CustomDrawerState();
+}
+
+class _CustomDrawerState extends State<CustomDrawer> {
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -56,15 +64,16 @@ class CustomDrawer extends StatelessWidget {
             leading: const Icon(Icons.info, color: Colors.green),
             title: const Text('Tentang Aplikasi'),
             onTap: () {
-                 Navigator.pushNamed(context, '/tentang-aplikasi');
+              Navigator.pushNamed(context, '/tentang-aplikasi');
             },
           ),
           const Divider(height: 1),
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.red),
             title: const Text('Logout'),
-            onTap: () {
-              Navigator.popUntil(context, ModalRoute.withName('/login'));
+            onTap: () async {
+              _authService.signOut();
+              Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
             },
           ),
         ],

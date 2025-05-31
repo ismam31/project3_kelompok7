@@ -270,6 +270,7 @@ class _ListMenuPageState extends State<ListMenuPage> {
                 // Dropdown Kategori
                 Expanded(
                   child: DropdownButtonFormField<String>(
+                    isExpanded: true,
                     value: _selectedCategory,
                     items:
                         ['semua', 'makanan', 'minuman', 'snack', 'kopi']
@@ -292,6 +293,7 @@ class _ListMenuPageState extends State<ListMenuPage> {
                 // Dropdown Sort
                 Expanded(
                   child: DropdownButtonFormField<String>(
+                    isExpanded: true,
                     value: _sortBy,
                     items:
                         ['no', 'nama', 'hargaJual', 'stok']
@@ -309,16 +311,21 @@ class _ListMenuPageState extends State<ListMenuPage> {
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: Icon(
-                    _ascending ? Icons.arrow_upward : Icons.arrow_downward,
+                const SizedBox(width: 10),
+                // Icon Button
+                SizedBox(
+                  width: 48, // atau 40 kalau mau lebih ramping
+                  height: 48,
+                  child: IconButton(
+                    icon: Icon(
+                      _ascending ? Icons.arrow_upward : Icons.arrow_downward,
+                    ),
+                    onPressed: () => setState(() => _ascending = !_ascending),
                   ),
-                  onPressed: () => setState(() => _ascending = !_ascending),
                 ),
               ],
             ),
           ),
-
           // List Menu
           Expanded(
             child: ListView.builder(

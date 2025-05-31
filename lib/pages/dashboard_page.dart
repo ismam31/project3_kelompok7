@@ -41,6 +41,8 @@ class DashboardContent extends StatelessWidget {
       child: GridView.count(
         crossAxisCount: MediaQuery.of(context).size.width < 600 ? 2 : 3,
         childAspectRatio: 1.2, // Lebih tinggi untuk grafik
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
         children: [
           DashboardCard(
             icon: Icons.shopping_cart,

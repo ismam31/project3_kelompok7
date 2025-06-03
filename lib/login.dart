@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kasir_kuliner/register.dart';
 import 'package:kasir_kuliner/services/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -12,23 +14,74 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final AuthService _authService = AuthService();
+  final authService = AuthService();
 
   bool isLoading = false;
+  bool isPasswordVisible = false;
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   Future<void> login() async {
+    final email = emailController.text;
+    final password = passwordController.text;
+
+    // Cek apakah email & password kosong
+    if (email.isEmpty || password.isEmpty) {
+      showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              title: const Text('Error'),
+              content: const Text('Email dan kata sandi tidak boleh kosong.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+      );
+      return;
+    }
+
     setState(() {
       isLoading = true;
     });
 
-    await Future.delayed(const Duration(seconds: 1)); // simulasi delay loading
+    final success = await authService.login(email, password);
 
     setState(() {
       isLoading = false;
     });
 
-    // Langsung navigasi ke dashboard tanpa API
-    Navigator.pushReplacementNamed(context, '/dashboard');
+    if (success) {
+      Navigator.pushReplacementNamed(context, '/dashboard');
+    } else {
+      showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              title: const Text('Login Gagal'),
+              content: const Text('Email atau password salah.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+      );
+    }
+  }
+
+  Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
   }
 
   @override
@@ -88,10 +141,21 @@ class _LoginPageState extends State<LoginPage> {
                             const SizedBox(height: 16),
                             TextField(
                               controller: passwordController,
-                              obscureText: true,
-                              decoration: const InputDecoration(
+                              obscureText: !isPasswordVisible,
+                              decoration: InputDecoration(
                                 prefixIcon: Icon(Icons.lock_outline),
-                                suffixIcon: Icon(Icons.visibility_off),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    isPasswordVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      isPasswordVisible = !isPasswordVisible;
+                                    });
+                                  },
+                                ),
                                 labelText: 'Kata Sandi',
                                 border: OutlineInputBorder(),
                               ),
@@ -126,19 +190,9 @@ class _LoginPageState extends State<LoginPage> {
                             const SizedBox(height: 16),
                             OutlinedButton.icon(
                               onPressed: () async {
-                                final UserCredential =
-                                    await _authService.signInWithGoogle();
-                                if (UserCredential != null) {
-                                  print("login sukses");
-                                  Navigator.pushReplacementNamed(
-                                    context,
-                                    '/dashboard',
-                                  );
-                                } else {
-                                  print("login gagal");
-                                }
+                                authService.signInWithGoogle();
                               },
-                              icon: const Icon(Icons.g_mobiledata),
+                              icon: const FaIcon(FontAwesomeIcons.google),
                               label: const Text('Sign in with Google'),
                               style: OutlinedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
